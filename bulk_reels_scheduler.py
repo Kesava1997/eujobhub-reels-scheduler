@@ -63,18 +63,34 @@ DEFAULT_FB_CAPTION = """Europe Jobs 2026 🇪🇺 | Latest Jobs & Vacancies Acro
 # ============================================================
 
 def load_tokens():
-    """Load Instagram and Facebook tokens"""
+    """
+    Load Instagram and Facebook tokens.
+
+    Preferred: environment variables IG_ACCESS_TOKEN / FB_ACCESS_TOKEN
+    (set these as GitHub Actions secrets - never commit token files to git).
+
+    Fallback: local token.txt / fb_user_token.txt files, for running
+    the script by hand on your own machine.
+    """
+    import os
+
+    ig_token = os.environ.get("IG_ACCESS_TOKEN")
+    fb_token = os.environ.get("FB_ACCESS_TOKEN")
+
+    if ig_token and fb_token:
+        return ig_token.strip(), fb_token.strip()
+
     if not IG_TOKEN_FILE.exists():
-        print("ERROR: token.txt (Instagram) not found!")
+        print("ERROR: No IG_ACCESS_TOKEN env var and token.txt (Instagram) not found!")
         raise SystemExit
-    
+
     if not FB_USER_TOKEN_FILE.exists():
-        print("ERROR: fb_user_token.txt (Facebook) not found!")
+        print("ERROR: No FB_ACCESS_TOKEN env var and fb_user_token.txt (Facebook) not found!")
         raise SystemExit
-    
+
     ig_token = IG_TOKEN_FILE.read_text(encoding="utf-8").strip()
     fb_token = FB_USER_TOKEN_FILE.read_text(encoding="utf-8").strip()
-    
+
     return ig_token, fb_token
 
 # ============================================================
@@ -535,6 +551,62 @@ def run_scheduler():
     print("ALL REELS PUBLISHED!")
     print("=" * 70)
 
+def run_scheduler_once():
+    """
+    Non-interactive, single-pass version of the scheduler for CI use
+    (GitHub Actions cron, cron jobs, etc).
+
+    - Never calls input()
+    - Never sleeps for hours - it checks once whether any reel is
+      currently due, publishes just that reel (or reels, if more than
+      one is overdue), saves the schedule, and exits.
+    - Trigger it repeatedly on a schedule (e.g. every 30-60 min) via
+      GitHub Actions `cron:` so it publishes each reel close to its
+      publish_time without needing a process that runs for days.
+    """
+    print("=" * 70)
+    print("EUJOBHUB - BULK REELS SCHEDULER (single pass / CI mode)")
+    print("=" * 70)
+
+    try:
+        ig_token, fb_user_token = load_tokens()
+        print("Tokens loaded successfully\n")
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"ERROR loading tokens: {e}")
+        raise SystemExit(1)
+
+    schedule = load_schedule()
+    now = datetime.now()
+
+    due = [r for r in schedule if r.status == "pending" and r.publish_time <= now]
+
+    if not due:
+        upcoming = sorted(
+            (r for r in schedule if r.status == "pending"),
+            key=lambda r: r.publish_time,
+        )
+        if upcoming:
+            print(f"No reel due yet. Next up: #{upcoming[0].video_number} "
+                  f"at {upcoming[0].publish_time.strftime('%Y-%m-%d %H:%M')}")
+        else:
+            print("No pending reels left - all done!")
+        return
+
+    print(f"{len(due)} reel(s) due now. Publishing...\n")
+
+    for reel in due:
+        published = publish_reel(reel, ig_token, fb_user_token)
+        schedule[schedule.index(reel)] = published
+        save_schedule(schedule)
+        log_reel(published)
+        print(f"  -> #{published.video_number}: {published.status}"
+              + (f" ({published.error})" if published.error else ""))
+
+    print("\nRun complete.")
+
+
 # ============================================================
 # LOGGING
 # ============================================================
@@ -698,4 +770,8 @@ def main():
             print("Invalid option")
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--run-once" in sys.argv:
+        run_scheduler_once()
+    else:
+        main()
