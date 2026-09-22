@@ -1,0 +1,3 @@
+video_number,status,platforms,ig_container_id,fb_video_id,publish_time,published_at,error
+1,failed,facebook,,,2026-09-15T09:00:00,2026-09-22T10:56:49.330760,Failed to publish to any platform
+2,published,"instagram,facebook",17947175364331828,,2026-09-15T12:00:00,2026-09-22T10:58:00.221331,
