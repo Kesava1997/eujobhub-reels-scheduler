@@ -1,0 +1,37 @@
+name: Bulk Reels Publisher
+
+on:
+  schedule:
+    # Runs every 30 minutes. Adjust to taste - it's cheap to run often
+    # since run_scheduler_once() exits immediately if nothing is due.
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}   # lets you still trigger it manually from the Actions tab
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run scheduler (single pass)
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+        run: python bulk_reels_scheduler.py --run-once
+
+      - name: Commit updated schedule/log back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reels_schedule.json reels_publish_log.csv
+          git diff --cached --quiet || git commit -m "Update reel schedule/log [skip ci]"
+          git push
