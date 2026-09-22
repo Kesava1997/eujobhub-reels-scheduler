@@ -2,3 +2,4 @@ video_number,status,platforms,ig_container_id,fb_video_id,publish_time,published
 1,failed,facebook,,,2026-09-15T09:00:00,2026-09-22T10:56:49.330760,Failed to publish to any platform
 2,published,"instagram,facebook",17947175364331828,,2026-09-15T12:00:00,2026-09-22T10:58:00.221331,
 1,published,facebook,,1074725672110869,2026-09-15T09:00:00,2026-09-22T11:48:57.096067,
+1,published,facebook,,1601760044775760,2026-09-15T09:00:00,2026-09-22T12:00:53.642442,
