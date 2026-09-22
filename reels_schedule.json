@@ -4,11 +4,13 @@
     "r2_url": "https://pub-b920483add26487c964812cdb7716dd3.r2.dev/1.mp4",
     "title": "Europe Jobs Video #1",
     "publish_time": "2026-09-15 09:00:00",
-    "platforms": ["instagram"],
+    "platforms": [
+      "instagram"
+    ],
     "caption": "Europe Jobs 2026 \ud83c\uddea\ud83c\uddfa\n\nLatest job vacancies across Europe.\n\nFind European job opportunities:\nhttps://eujobhub.com\n\n#EuropeJobs #EUJobs #JobsInEurope",
-    "ig_container_id": null,
+    "ig_container_id": "17947225245331828",
     "fb_video_id": "1074725672110869",
-    "status": "pending",
+    "status": "published",
     "error": ""
   },
   {
@@ -16,7 +18,10 @@
     "r2_url": "https://pub-b920483add26487c964812cdb7716dd3.r2.dev/2.mp4",
     "title": "Europe Jobs Video #2",
     "publish_time": "2026-09-15 12:00:00",
-    "platforms": ["instagram", "facebook"],
+    "platforms": [
+      "instagram",
+      "facebook"
+    ],
     "caption": "Europe Jobs 2026 \ud83c\uddea\ud83c\uddfa\n\nLatest job vacancies across Europe.\n\nFind European job opportunities:\nhttps://eujobhub.com\n\n#EuropeJobs #EUJobs #JobsInEurope",
     "ig_container_id": "17947175364331828",
     "fb_video_id": null,
