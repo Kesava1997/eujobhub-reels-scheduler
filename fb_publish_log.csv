@@ -1,0 +1,2 @@
+video_number,fb_status,fb_video_id,publish_time,published_at,fb_error
+2,failed,,2026-09-15T12:00:00,2026-09-24T08:28:51.131533,Facebook publish failed - see run logs
