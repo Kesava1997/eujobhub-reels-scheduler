@@ -1,0 +1,35 @@
+name: Facebook Reels Publisher
+
+on:
+  schedule:
+    - cron: "15,45 * * * *"   # every 30 min, offset from Instagram to avoid commit clashes
+  workflow_dispatch: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Facebook publisher (single pass)
+        env:
+          FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+        run: python facebook_publisher.py --run-once
+
+      - name: Commit updated schedule/log back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase
+          git add reels_schedule.json fb_publish_log.csv
+          git diff --cached --quiet || git commit -m "Facebook publish update [skip ci]"
+          git push
